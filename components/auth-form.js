@@ -1,12 +1,12 @@
 "use client";
 
+import { auth } from "@/actions/auth";
 import Link from "next/link";
-import { useFormStatus, useFormState } from "react-dom";
-import { signup } from "@/actions/auth";
+import { useFormState, useFormStatus } from "react-dom";
 
-export default function AuthForm() {
+export default function AuthForm({ mode }) {
   const { pending } = useFormStatus();
-  const [formState, formAction] = useFormState(signup, {});
+  const [formState, formAction] = useFormState(auth.bind(null, mode), {});
 
   return (
     <form id="auth-form" action={formAction}>
@@ -23,7 +23,11 @@ export default function AuthForm() {
       </p>
       <p>
         <button type="submit" disabled={pending}>
-          {pending ? "Loading..." : "Create Account"}
+          {pending
+            ? "Loading..."
+            : mode === "login"
+            ? "Login"
+            : "Create Account"}
         </button>
       </p>
       {formState.errors && (
@@ -34,7 +38,11 @@ export default function AuthForm() {
         </ul>
       )}
       <p>
-        <Link href="/">Login with existing account.</Link>
+        <Link href={`/?mode=${mode === "login" ? "signup" : "login"}`}>
+          {mode === "login"
+            ? "Create an account."
+            : "Login with existing account."}
+        </Link>
       </p>
     </form>
   );
